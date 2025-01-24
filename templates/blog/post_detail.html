@@ -1,0 +1,121 @@
+{% extends "../base.html" %} 
+{% block title %} Post Details {% endblock title %}
+{% block body %}
+<div class="container my-2">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card my-2">
+        <img
+          src="{{ post.img.url }}"
+          class="card-img-top mx-auto d-block"
+          alt="{{ post.img }}"
+        />
+
+        <div class="card-body">
+          <h5 class="card-title">{{ post.title }}</h5>
+
+          <h6 class="card-subtitle mb-2 text-body-secondary">
+            By - <b>{{ request.user.username }}</b> Created at -
+            {{ post.created_date }}
+          </h6>
+          <p class="card-text">{{ post.content }}</p>
+
+          <h6 class="card-subtitle mb-2 text-body-secondary">Categories:
+            {% for category in post.category.all %}
+              {{ category.name }}
+            {% endfor %}
+            <p>Last Update - {{ post.last_modified }}</p>
+          </h6>
+          <!-- tangs -->
+          
+          <div class="row mb-2">
+      
+                <div class="cards">
+                            <div style="display:flex">
+                              <p>Tags </p>
+                                {% for tag in post.tags.all %}
+                                <a href="" class="mr-1">#{{ tag }}</a>
+                                {% endfor %}
+                            </div>
+                
+            </div>
+       
+    </div> 
+          <!-- tangs -->
+        <div>
+          <a href="{% url 'PostEdit' post.id %}">
+            <button type="submit" class="btn btn-primary" >Edit</button>
+          </a>
+          <a href="{% url 'PostDelete' post.id %}">
+            <button type="submit" class="btn btn-danger" >Delete</button>
+          </a>
+        </div>
+        <div>
+          <h1>Leave Comment:</h1>
+          <hr>
+          <form action="{% url 'AddComment' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="">Your Comment: </label>
+              <input class="form-control" type="text" name="comment" id="" placeholder="Enter your comment" >
+              <input type="hidden" name="postid" value="{{ post.id }}">
+              <input type="hidden" name="parentid" value="">
+            </div>
+            <button type="submit" class="btn btn-info my-2">Comment</button>
+          </form>
+        </div>
+        <div>
+          <!-- Display top-level comments -->
+          {% for comment in comments %}
+          <div class="row">
+            <div class="col-md-1">
+              <img src="{{ comment.user.userpfofile.image.url }}" class="img-thumbnail" alt="">
+            </div>
+            <div class="col-md-11">
+              <b>{{ comment.user.username }}</b> <span class="bedge bedge-secondary">{{ comment.created_at }}</span>
+              <div>{{ comment.text }}</div>
+              <!-- Reply form for this comment -->
+              <form action="{% url 'AddComment' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="">Your Reply: </label>
+                  <input class="form-control" type="text" name="comment" placeholder="Enter your reply">
+                  <input type="hidden" name="postid" value="{{ post.id }}">
+                  <input type="hidden" name="parentid" value="{{ comment.id }}">
+                </div>
+                <button type="submit" class="btn btn-info my-2">Reply</button>
+              </form>
+              <!-- Display replies for this comment -->
+              {% for reply in replies %}
+              <div class="row ml-3">
+                <div class="col-md-1">
+                  <img src="{{ reply.user.userprofile.image.url }}" class="img-thumbnail" alt="">
+                </div>
+                <div class="col-md-11">
+                  <b>{{ reply.user.username }}</b> <span class="bedge bedge-secondary">{{ reply.created_at }}</span>
+                  <div>{{ reply.text }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card" style="width: 18rem">
+        <div class="card-header">CATEGORIES</div>
+        <ul class="list-group list-group-flush">
+            {% for category in items %}
+            <li class="list-group-item">{{ category.name }}</li>
+            {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  
+  </div>
+</div>
+{% endblock body %}
